@@ -11,175 +11,245 @@
 
 ## 1. Addressing Strategy
 
-The network uses the private IPv4 address block `10.48.0.0/16`.
+The network uses the private IPv4 addressing block:
 
-Each department is assigned a dedicated `/24` subnet. VLANs are used to separate departments into different broadcast domains while Router-on-a-Stick provides inter-VLAN routing.
+`10.48.0.0/16`
 
-The POS network is separated from the main office network using a dedicated physical router interface and dedicated POS switch.
+The design uses separate `/24` networks for each major logical segment.
 
-A separate server network is also provided for shared infrastructure services.
+The third octet corresponds to the VLAN number wherever a VLAN is assigned.
+
+For example:
+
+`VLAN 20 → 10.48.20.0/24`
+
+This convention makes the addressing structure predictable and easier to understand and troubleshoot.
+
+Each `/24` provides:
+
+**254 usable host addresses**
+
+which provides significant capacity for future expansion.
 
 ---
 
 ## 2. VLAN and Subnet Allocation
 
-| VLAN | Department / Purpose | Network Address | Subnet Mask | Default Gateway | Usable Host Range | Broadcast |
-|---:|---|---|---|---|---|---|
-| 10 | Administration | 10.48.10.0/24 | 255.255.255.0 | 10.48.10.1 | 10.48.10.2–10.48.10.254 | 10.48.10.255 |
-| 20 | Operations / CR1 | 10.48.20.0/24 | 255.255.255.0 | 10.48.20.1 | 10.48.20.2–10.48.20.254 | 10.48.20.255 |
-| 30 | Finance | 10.48.30.0/24 | 255.255.255.0 | 10.48.30.1 | 10.48.30.2–10.48.30.254 | 10.48.30.255 |
-| 40 | IT / Technical | 10.48.40.0/24 | 255.255.255.0 | 10.48.40.1 | 10.48.40.2–10.48.40.254 | 10.48.40.255 |
-| 50 | POS | 10.48.50.0/24 | 255.255.255.0 | 10.48.50.1 | 10.48.50.2–10.48.50.254 | 10.48.50.255 |
-| 60 | Guest Wi-Fi | 10.48.60.0/24 | 255.255.255.0 | 10.48.60.1 | 10.48.60.2–10.48.60.254 | 10.48.60.255 |
-| — | Server Network | 10.48.70.0/24 | 255.255.255.0 | 10.48.70.1 | 10.48.70.2–10.48.70.254 | 10.48.70.255 |
+| VLAN | Segment | Network | Subnet Mask | Default Gateway | Usable Hosts |
+|---:|---|---|---|---|---:|
+| 10 | Administration | 10.48.10.0/24 | 255.255.255.0 | 10.48.10.1 | 254 |
+| 20 | Operations | 10.48.20.0/24 | 255.255.255.0 | 10.48.20.1 | 254 |
+| 30 | Finance | 10.48.30.0/24 | 255.255.255.0 | 10.48.30.1 | 254 |
+| 40 | IT / Technical | 10.48.40.0/24 | 255.255.255.0 | 10.48.40.1 | 254 |
+| 50 | POS | 10.48.50.0/24 | 255.255.255.0 | 10.48.50.1 | 254 |
+| 60 | Guest Wi-Fi | 10.48.60.0/24 | 255.255.255.0 | 10.48.60.1 | 254 |
+| 70 | Server Infrastructure | 10.48.70.0/24 | 255.255.255.0 | 10.48.70.1 | 254 |
 
 ---
 
-## 3. Device Addressing
+## 3. Default Gateway Convention
+
+The first usable address in every subnet is reserved for the default gateway.
+
+Therefore:
+
+- VLAN 10 → `10.48.10.1`
+- VLAN 20 → `10.48.20.1`
+- VLAN 30 → `10.48.30.1`
+- VLAN 40 → `10.48.40.1`
+- VLAN 50 → `10.48.50.1`
+- VLAN 60 → `10.48.60.1`
+- VLAN 70 → `10.48.70.1`
+
+This consistent convention simplifies configuration and troubleshooting.
+
+---
+
+## 4. Device Addressing
 
 ### Administration — VLAN 10
 
-| Device | IP Address | Default Gateway |
+| Device | IP Address | Gateway |
 |---|---|---|
 | PC-ADMIN-01 | 10.48.10.10 | 10.48.10.1 |
 | PC-ADMIN-02 | 10.48.10.11 | 10.48.10.1 |
 
 ### Operations — VLAN 20
 
-| Device | IP Address | Default Gateway |
+| Device | IP Address | Gateway |
 |---|---|---|
 | PC-OPS-01 | 10.48.20.10 | 10.48.20.1 |
 | PC-OPS-02 | 10.48.20.11 | 10.48.20.1 |
 
-**CR1 Capacity:**  
-The `10.48.20.0/24` subnet provides 254 usable host addresses. This allows additional Operations staff to be added without redesigning the subnet.
-
 ### Finance — VLAN 30
 
-| Device | IP Address | Default Gateway |
+| Device | IP Address | Gateway |
 |---|---|---|
 | PC-FIN-01 | 10.48.30.10 | 10.48.30.1 |
 | PC-FIN-02 | 10.48.30.11 | 10.48.30.1 |
 
 ### IT / Technical — VLAN 40
 
-| Device | IP Address | Default Gateway |
+| Device | IP Address | Gateway |
 |---|---|---|
 | PC-IT-01 | 10.48.40.10 | 10.48.40.1 |
 | PC-IT-02 | 10.48.40.11 | 10.48.40.1 |
 
 ### POS — VLAN 50
 
-| Device | IP Address | Default Gateway |
+| Device | IP Address | Gateway |
 |---|---|---|
 | POS-01 | 10.48.50.10 | 10.48.50.1 |
 | POS-02 | 10.48.50.11 | 10.48.50.1 |
 | POS-03 | 10.48.50.12 | 10.48.50.1 |
 
-The POS devices operate within a dedicated VLAN and use a dedicated physical router interface.
-
 ### Guest Wi-Fi — VLAN 60
 
-| Device | IP Address | Default Gateway |
+| Device | IP Address | Gateway |
 |---|---|---|
 | AP-GUEST | 10.48.60.10 | 10.48.60.1 |
 
-Guest client addresses may be assigned dynamically using DHCP.
+Guest client devices may receive addresses dynamically through DHCP.
 
 ---
 
-## 4. Server Network
+## 5. Server Infrastructure — VLAN 70
 
-The server infrastructure uses a dedicated network:
+The server infrastructure is separated into:
 
-**Network:** `10.48.70.0/24`  
-**Default Gateway:** `10.48.70.1`
+**VLAN 70**
 
-| Server | IP Address | Default Gateway | Purpose |
+Network:
+
+`10.48.70.0/24`
+
+Default gateway:
+
+`10.48.70.1`
+
+| Server | IP Address | Gateway | Purpose |
 |---|---|---|---|
 | DHCP-SRV | 10.48.70.30 | 10.48.70.1 | DHCP Services |
 | FILE-SRV | 10.48.70.31 | 10.48.70.1 | File Services |
 | WEB-SRV | 10.48.70.32 | 10.48.70.1 | Web Services |
 
-Server addresses are statically assigned so that infrastructure services remain reachable at predictable addresses.
+Server addresses are statically assigned to provide predictable addressing for infrastructure services.
 
 ---
 
-## 5. Router Interface Allocation
+## 6. Router-on-a-Stick Sub-Interfaces
+
+The main office VLANs and server VLAN are transported using IEEE 802.1Q tagging.
+
+| Sub-interface | VLAN | Gateway | Purpose |
+|---|---:|---|---|
+| G0/0/1.10 | 10 | 10.48.10.1/24 | Administration |
+| G0/0/1.20 | 20 | 10.48.20.1/24 | Operations |
+| G0/0/1.30 | 30 | 10.48.30.1/24 | Finance |
+| G0/0/1.40 | 40 | 10.48.40.1/24 | IT / Technical |
+| G0/0/1.60 | 60 | 10.48.60.1/24 | Guest Wi-Fi |
+| G0/0/1.70 | 70 | 10.48.70.1/24 | Server Infrastructure |
+
+The exact interface numbering will be confirmed against the selected Cisco Packet Tracer router model during implementation.
+
+---
+
+## 7. Physical Network Interfaces
 
 | Router Interface | Connection | Purpose |
 |---|---|---|
-| Gig0/0/0 | Router-Edge | WAN / Internet connection |
-| Gig0/0/1 | Switch-Office | 802.1Q trunk for VLANs 10, 20, 30, 40 and 60 |
-| Gig0/0/2 | Switch-POS | Dedicated POS network connection |
-| Gig0/0/3 | Server-Switch | Server network connection |
+| Gig0/0/0 | Router-Edge | WAN / Internet |
+| Gig0/0/1 | Core-Switch | 802.1Q trunk |
+| Gig0/0/2 | Switch-POS | Dedicated POS path |
+
+The Core-Switch then distributes the relevant VLANs to departmental switches and the Server-Switch.
 
 ---
 
-## 6. Router-on-a-Stick Gateway Mapping
+## 8. Trunk VLANs
 
-The following logical subinterfaces will provide default gateways for the office VLANs:
+The main 802.1Q trunk carries:
 
-| Subinterface | VLAN | Gateway |
-|---|---:|---|
-| Gig0/0/1.10 | 10 | 10.48.10.1 |
-| Gig0/0/1.20 | 20 | 10.48.20.1 |
-| Gig0/0/1.30 | 30 | 10.48.30.1 |
-| Gig0/0/1.40 | 40 | 10.48.40.1 |
-| Gig0/0/1.60 | 60 | 10.48.60.1 |
+- VLAN 10 — Administration
+- VLAN 20 — Operations
+- VLAN 30 — Finance
+- VLAN 40 — IT / Technical
+- VLAN 60 — Guest Wi-Fi
+- VLAN 70 — Server Infrastructure
 
-VLAN 50 uses the dedicated physical router interface rather than the office 802.1Q trunk.
-
----
-
-## 7. Address Allocation Rules
-
-The following conventions are used:
-
-- `.1` is reserved for the default gateway.
-- `.10–.99` is used for assigned end devices and infrastructure where appropriate.
-- Server infrastructure uses `.30` onward within the server network.
-- DHCP address pools will use a separate range to avoid conflicts with statically assigned infrastructure addresses.
-- Network and broadcast addresses are not assigned to hosts.
-- The `/24` subnet size provides 254 usable host addresses per network.
+VLAN 50 is kept on the dedicated POS path.
 
 ---
 
-## 8. Scalability and Change Request CR1
+## 9. Change Request CR1
 
-The Operations department is assigned `10.48.20.0/24`.
+Operations is the selected CR1 department.
 
-This provides 254 usable host addresses:
+Current network:
 
-`10.48.20.1–10.48.20.254`
+`10.48.20.0/24`
 
-The default gateway is:
+Usable range:
 
-`10.48.20.1`
+`10.48.20.1 – 10.48.20.254`
 
-Current Operations devices use:
+There are 254 usable host addresses.
+
+Current Operations devices include:
 
 - `10.48.20.10`
 - `10.48.20.11`
 
-The remaining address capacity allows the requested additional staff to be accommodated without changing the subnet or rebuilding the network.
+The subnet therefore has substantial remaining capacity.
+
+The eight additional staff members can be added using unused addresses in the existing subnet without:
+
+- Creating a new VLAN
+- Changing the subnet
+- Changing the gateway
+- Re-addressing existing users
+- Rebuilding the routing architecture
 
 ---
 
-## 9. Design Notes
+## 10. Address Allocation Rules
 
-The addressing plan supports the network's segmentation and resilience requirements:
+The design follows these conventions:
 
-1. Departments operate in separate VLANs and IP subnets.
-2. Router-on-a-Stick provides inter-VLAN routing for the office VLANs.
-3. POS devices are isolated in VLAN 50.
-4. POS traffic uses a dedicated physical router interface and POS switch.
-5. Server infrastructure is placed on a separate server network.
-6. The `/24` subnet allocation provides sufficient capacity for future growth.
-7. The addressing scheme follows a consistent and predictable numbering convention.
+- `.1` is reserved for the default gateway.
+- Infrastructure addresses are statically assigned.
+- Server addresses use predictable static addresses.
+- End-user addressing may use DHCP where appropriate.
+- Network addresses are not assigned to hosts.
+- Broadcast addresses are not assigned to hosts.
+- `/24` subnets provide 254 usable addresses.
+- VLAN and subnet numbering follows the same third-octet convention.
 
 ---
 
-**Document Status:** Initial IP Addressing Plan  
-**Project:** CMPG325-2026-123  
-**Author:** Ofentse Seko
+## 11. Design Rationale
+
+The addressing plan was deliberately designed for clarity and scalability.
+
+Using the VLAN number in the third octet makes it immediately possible to identify the relationship between the logical VLAN and its IP subnet.
+
+The `/24` allocation provides more capacity than is currently required but allows future users and devices to be added without repeatedly changing subnet boundaries.
+
+This is particularly important for CR1 because the Operations department can absorb eight additional staff members without requiring a network redesign.
+
+---
+
+## 12. Implementation Status
+
+**Milestone 1:** Addressing plan designed.
+
+The addresses and interface mappings will be verified during Cisco Packet Tracer implementation.
+
+Final testing will confirm:
+
+- Gateway reachability
+- Inter-VLAN routing
+- DHCP operation
+- Server connectivity
+- POS connectivity
+- CR1 expansion
