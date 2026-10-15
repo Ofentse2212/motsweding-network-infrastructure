@@ -1,0 +1,148 @@
+Current configuration : 2646 bytes
+!
+version 15.1
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname Router-Core
+!
+!
+!
+!
+ip dhcp excluded-address 10.48.10.1 10.48.10.9
+ip dhcp excluded-address 10.48.20.1 10.48.20.9
+ip dhcp excluded-address 10.48.30.1 10.48.30.9
+ip dhcp excluded-address 10.48.40.1 10.48.40.9
+ip dhcp excluded-address 10.48.50.1 10.48.50.9
+ip dhcp excluded-address 10.48.60.1 10.48.60.9
+ip dhcp excluded-address 10.48.70.1 10.48.70.20
+!
+ip dhcp pool VLAN10_Admin
+ network 10.48.10.0 255.255.255.0
+ default-router 10.48.10.1
+ dns-server 10.48.70.10
+ip dhcp pool VLAN20_Ops
+ network 10.48.20.0 255.255.255.0
+ default-router 10.48.20.1
+ dns-server 10.48.70.10
+ip dhcp pool VLAN30_Fin
+ network 10.48.30.0 255.255.255.0
+ default-router 10.48.30.1
+ dns-server 10.48.70.10
+ip dhcp pool VLAN40_IT
+ network 10.48.40.0 255.255.255.0
+ default-router 10.48.40.1
+ dns-server 10.48.70.10
+ip dhcp pool VLAN50_POS
+ network 10.48.50.0 255.255.255.0
+ default-router 10.48.50.1
+ dns-server 10.48.70.10
+ip dhcp pool VLAN60_Guest
+ network 10.48.60.0 255.255.255.0
+ default-router 10.48.60.1
+ dns-server 10.48.70.10
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+!
+!
+license udi pid CISCO2911/K9 sn FTX15242VFB-
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ description WAN Link to Router-Edge
+ ip address 10.48.0.2 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ description ROAS Trunk Link to Core-Switch
+ no ip address
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1.10
+ encapsulation dot1Q 10
+ ip address 10.48.10.1 255.255.255.0
+ ip helper-address 10.48.70.10
+!
+interface GigabitEthernet0/1.20
+ encapsulation dot1Q 20
+ ip address 10.48.20.1 255.255.255.0
+ ip helper-address 10.48.70.10
+!
+interface GigabitEthernet0/1.30
+ encapsulation dot1Q 30
+ ip address 10.48.30.1 255.255.255.0
+ ip helper-address 10.48.70.10
+!
+interface GigabitEthernet0/1.40
+ encapsulation dot1Q 40
+ ip address 10.48.40.1 255.255.255.0
+ ip helper-address 10.48.70.10
+!
+interface GigabitEthernet0/1.60
+ encapsulation dot1Q 60
+ ip address 10.48.60.1 255.255.255.0
+ ip helper-address 10.48.70.10
+!
+interface GigabitEthernet0/1.70
+ encapsulation dot1Q 70
+ ip address 10.48.70.1 255.255.255.0
+ ip helper-address 10.48.70.10
+!
+interface GigabitEthernet0/2
+ description Dedicated Path to POS Switch
+ ip address 10.48.50.1 255.255.255.0
+ ip helper-address 10.48.70.10
+ duplex auto
+ speed auto
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 10.48.0.1 
+!
+ip flow-export version 9
+!
+!
+!
+!
+!
+!
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login
+!
+!
+!
+end
