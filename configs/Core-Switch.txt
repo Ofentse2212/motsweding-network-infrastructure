@@ -1,0 +1,20 @@
+Current configuration : 1825 bytes
+!
+version 15.0
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname Core-Switch
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+interface FastEthernet0/1
+ description TRUNK to SW-ADMIN
+ switchport trunk allowed vlan 10,20,30,40,50,60,70
